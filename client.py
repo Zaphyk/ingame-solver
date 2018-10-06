@@ -3,6 +3,7 @@ import requests
 import json
 import sys
 import trivia
+import threading
 
 class Client():
 
@@ -17,9 +18,12 @@ class Client():
             'Sec-WebSocket-Protocol: graphql-ws',
             'origin: http://socket.ingame.dift.co/',
         ]
-        self.guesser = trivia.Guesser()
+        self.trivia = trivia.Guesser()
         self.ws = None
         self.is_running = False
+        self.question_id = None
+        self.quiz = None
+        self.options = None
 
     def run(self):
         self.open()
@@ -69,8 +73,18 @@ class Client():
             print(json.dumps(data))
         sys.stdout.flush()
 
-    def process_question(self, id, quiz, options):
+    def process_question(self, question_id, quiz, options):
+        self.question_id = question_id
+        self.quiz = quiz
+        self.options = options
+        def guess():
+            self.guess_callback(self.trivia.guess(quiz, options))
+        thread = Thread(guess)
+        thread.start()
 
+    def guess_callback(self, answer_index):
+        answer = self.options[answer_index]
+        print(f"best guess is: '{answer}' ")
 
 client = Client()
 client.run()

@@ -10,13 +10,15 @@ class Guesser():
 
 
 def test():
-    trivia = Guesser()
     accuracy = 0
     total = 0
     def assert_guess(question: str, options: list, answer: int):
+        trivia = Guesser()
         nonlocal total
         nonlocal accuracy
+        start = timer()
         best_guess = trivia.guess(question, options)
+        end = timer()
         correct = best_guess is answer
         if correct:
             accuracy += 1
@@ -27,6 +29,7 @@ def test():
                 'green' if correct else 'red'
             )
         )
+        print(f"Answering this question took {end - start} seconds")
         total += 1
 
     assert_guess(

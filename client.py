@@ -18,12 +18,17 @@ class Client():
             'Sec-WebSocket-Protocol: graphql-ws',
             'origin: http://socket.ingame.dift.co/',
         ]
+        self.token = self.load_token()
         self.trivia = trivia.Guesser()
         self.ws = None
         self.is_running = False
         self.question_id = None
         self.quiz = None
         self.options = None
+
+    def load_token(self):
+        with open('settings.json', 'r') as fp:
+            return json.load(fp)['ingame_token']
 
     def run(self):
         self.open()
@@ -48,9 +53,9 @@ class Client():
         self.ws.send(msg)
 
     def susbscribe(self):
-        self.send(r'{"id":"7","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onQuestionStart","query":"subscription onQuestionStart {\n  questionStarted {\n    ...questionStarted\n    __typename\n  }\n}\n\nfragment questionStarted on QuestionStarted {\n  id\n  quiz\n  options\n  index\n  bgColor\n  footer {\n    logoUrl\n    alignment\n    __typename\n  }\n  __typename\n}\n","authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViOTE1ZDQzODU2YjdhNTUwZDAzZTU4MCIsInNjb3BlIjpbIlVTRVIiXSwiaWF0IjoxNTM2NjgzNDE2fQ.IOUFqVxFVW5nq5XJme0_y1Yqw4OeP0UDiQff0Hj5lY0"}}')
-        self.send(r'{"id":"8","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onQuestionFinish","query":"subscription onQuestionFinish {\n  questionFinished {\n    ...questionFinished\n    __typename\n  }\n}\n\nfragment questionFinished on QuestionFinished {\n  id\n  quiz\n  answer\n  options\n  stats\n  index\n  extraLifeAllowed\n  bgColor\n  footer {\n    logoUrl\n    alignment\n    __typename\n  }\n  __typename\n}\n","authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViOTE1ZDQzODU2YjdhNTUwZDAzZTU4MCIsInNjb3BlIjpbIlVTRVIiXSwiaWF0IjoxNTM2NjgzNDE2fQ.IOUFqVxFVW5nq5XJme0_y1Yqw4OeP0UDiQff0Hj5lY0"}}')
-        self.send(r'{"id":"5","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onGameStateUpdated","query":"subscription onGameStateUpdated {\n  gameStateUpdated {\n    id\n    state\n    __typename\n  }\n}\n","authorization":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViOTE1ZDQzODU2YjdhNTUwZDAzZTU4MCIsInNjb3BlIjpbIlVTRVIiXSwiaWF0IjoxNTM2NjgzNDE2fQ.IOUFqVxFVW5nq5XJme0_y1Yqw4OeP0UDiQff0Hj5lY0"}}')
+        self.send(r'{"id":"7","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onQuestionStart","query":"subscription onQuestionStart {\n  questionStarted {\n    ...questionStarted\n    __typename\n  }\n}\n\nfragment questionStarted on QuestionStarted {\n  id\n  quiz\n  options\n  index\n  bgColor\n  footer {\n    logoUrl\n    alignment\n    __typename\n  }\n  __typename\n}\n","authorization":"' + self.token + '"}}')
+        self.send(r'{"id":"8","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onQuestionFinish","query":"subscription onQuestionFinish {\n  questionFinished {\n    ...questionFinished\n    __typename\n  }\n}\n\nfragment questionFinished on QuestionFinished {\n  id\n  quiz\n  answer\n  options\n  stats\n  index\n  extraLifeAllowed\n  bgColor\n  footer {\n    logoUrl\n    alignment\n    __typename\n  }\n  __typename\n}\n","authorization":"' + self.token + '"}}')
+        self.send(r'{"id":"5","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onGameStateUpdated","query":"subscription onGameStateUpdated {\n  gameStateUpdated {\n    id\n    state\n    __typename\n  }\n}\n","authorization":"' + self.token + '"}}')
 
     def join_game(self):
         pass

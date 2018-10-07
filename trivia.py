@@ -1,17 +1,33 @@
+from termcolor import colored
 
 class Guesser():
 
     def __init__(self):
         pass
 
-    def guess(question: str, options: list) -> int:
-        pass
+    def guess(self, question: str, options: list) -> int:
+        return 2
 
 
-if __name__ == '__main__':
+def test():
     trivia = Guesser()
+    accuracy = 0
+    total = 0
     def assert_guess(question: str, options: list, answer: int):
-        assert(trivia.guess(question, options))
+        nonlocal total
+        nonlocal accuracy
+        best_guess = trivia.guess(question, options)
+        correct = best_guess is answer
+        if correct:
+            accuracy += 1
+        print('-------------------------------------------------------------------')
+        print(
+            colored(
+                f"\n{question}. \n* Your answer is '{options[best_guess]}' \n* Correct answer is '{options[answer]}'\n",
+                'green' if correct else 'red'
+            )
+        )
+        total += 1
 
     assert_guess(
         '¿Cuál de estos deportistas argentinos fue dos veces abanderado Olímpico?',
@@ -30,3 +46,8 @@ if __name__ == '__main__':
         ["Lima, Perú","Bogotá, Colombia","Buenos Aires, Argentina"],
         1
     )
+    print('-------------------------------------------------------------------')
+    print(f" Trivia guesser had an accuracy of '{(accuracy / total) * 100.0}%'")
+
+if __name__ == '__main__':
+    test()

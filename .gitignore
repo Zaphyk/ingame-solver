@@ -1,11 +1,5 @@
-settings.json
 venv
 *.pyc
-staticfiles
 .env
-db.sqlite3
 .idea/
 __pycache__
-bin/
-content/
-done.txt

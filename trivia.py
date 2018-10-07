@@ -35,7 +35,7 @@ class Guesser():
         doc = nlp(question)
 
         for token in doc:
-            if token.is_alpha:
+            if token.is_alpha and token.pos_ is not 'AUX' and token.pos_ is not 'ADP':
                 keywords.append(token.text.lower())
         return keywords
 
@@ -64,7 +64,7 @@ class Guesser():
                 rank += title.count(keyword)
             rank += snippet.count(option.lower())
             rank += title.count(option.lower())
-        return rank #+ int(data['searchInformation']['totalResults']) / 1000.0
+        return rank
 
     def analyze(self, probabilities: dict, options: list):
         highest = -1

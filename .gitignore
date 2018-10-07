@@ -2,4 +2,5 @@ venv
 *.pyc
 .env
 .idea/
+settings.json
 __pycache__

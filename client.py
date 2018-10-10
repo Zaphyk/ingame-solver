@@ -4,6 +4,7 @@ import json
 import sys
 import trivia
 import threading
+import os
 
 class Client():
 
@@ -27,7 +28,7 @@ class Client():
         self.options = None
 
     def load_token(self):
-        with open('settings.json', 'r') as fp:
+        with open(os.getcwd() + '/settings.json', 'r') as fp:
             return json.load(fp)['ingame_token']
 
     def run(self):

@@ -1,10 +1,11 @@
 import requests
 import json
+import os
 
 class TriviaHandler():
 
     def __init__(self):
-        with open('settings.json', 'r') as fp:
+        with open(os.getcwd() + '/settings.json', 'r') as fp:
             self.config = json.loads(fp.read())
         self.host = 'http://api.ingame.dift.co'
         self.headers = {

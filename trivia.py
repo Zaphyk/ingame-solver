@@ -12,7 +12,7 @@ class Searcher():
         self.cse_id = self.config['google_cse_id']
 
     def load_config(self):
-        with open('settings.json', 'r') as fp:
+        with open(os.path.dirname(__file__) + '/settings.json', 'r') as fp:
             return json.load(fp)
 
     def google_search(self, search_term, **kwargs):

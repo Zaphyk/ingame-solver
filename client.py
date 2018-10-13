@@ -28,7 +28,7 @@ class Client():
         self.options = None
 
     def load_token(self):
-        with open(os.path.dirname(__file__) + '/settings.json', 'r') as fp:
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/settings.json', 'r') as fp:
             return json.load(fp)['ingame_token']
 
     def run(self):

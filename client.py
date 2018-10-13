@@ -58,12 +58,6 @@ class Client():
         self.send(r'{"id":"8","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onQuestionFinish","query":"subscription onQuestionFinish {\n  questionFinished {\n    ...questionFinished\n    __typename\n  }\n}\n\nfragment questionFinished on QuestionFinished {\n  id\n  quiz\n  answer\n  options\n  stats\n  index\n  extraLifeAllowed\n  bgColor\n  footer {\n    logoUrl\n    alignment\n    __typename\n  }\n  __typename\n}\n","authorization":"' + self.token + '"}}')
         self.send(r'{"id":"5","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onGameStateUpdated","query":"subscription onGameStateUpdated {\n  gameStateUpdated {\n    id\n    state\n    __typename\n  }\n}\n","authorization":"' + self.token + '"}}')
 
-    def join_game(self):
-        pass
-
-    def answer_question(self):
-        pass
-
     def on_msg(self, data):
         if 'id' in data and data['id'] is 7:
             print('-----QUESTION RECEIVED----')

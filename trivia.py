@@ -42,7 +42,7 @@ class Guesser():
             if token.is_alpha and token.pos_ is not 'AUX' and token.pos_ is not 'ADP':
                 keywords.append(token.text.lower())
         end = timer()
-        print(f"NLP took '{end - start}' seconds.")
+        self.log(f"NLP took '{end - start}' seconds.")
         return keywords
 
     def get_search_queries(self, keywords: list, options: list) -> list:
@@ -119,7 +119,7 @@ def test():
         ["Luciana Aymar", "Carlos Espínola", "Juan Curuchet"],
         1
     )
-    """assert_guess(
+    assert_guess(
         '¿Qué libro fue prohibido durante la dictadura militar argentina?',
         ["La Metamorfosis","El Principito","Moby Dick"],
         1
@@ -195,7 +195,7 @@ def test():
         u'\u00bfHace cu\u00e1ntos a\u00f1os est\u00e1 el cuerpo de Lenin en el Kremlin?',
         [u"51 a\u00f1os", u"94 a\u00f1os", u"No est\u00e1 en el Kremlin"],
         1
-    )"""
+    )
     print('-------------------------------------------------------------------')
     print(f"Average question took '{total_time / total}' seconds")
     print(f" Trivia guesser had an accuracy of '{(accuracy / total) * 100.0}%'")

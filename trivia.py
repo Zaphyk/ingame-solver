@@ -60,9 +60,6 @@ class Guesser():
             snippet = item['snippet'].lower()
             title = item['title'].lower()
 
-            for keyword in keywords:
-                rank += snippet.count(keyword)
-                rank += title.count(keyword)
             rank += snippet.count(option.lower())
             rank += title.count(option.lower())
         return rank

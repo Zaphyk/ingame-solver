@@ -20,16 +20,17 @@ class Client():
             'origin: http://socket.ingame.dift.co/',
         ]
         self.current_directory = os.path.dirname(os.path.abspath(__file__))
-        self.token = self.load_token()
+        self.config = self.load_config()
+        self.token = self.config['ingame_token']
         self.trivia = trivia.Guesser()
         self.ws = None
         self.is_running = False
         self.quiz = None
         self.options = None
 
-    def load_token(self):
+    def load_config(self):
         with open(f"{self.current_directory}/settings.json", 'r') as fp:
-            return json.load(fp)['ingame_token']
+            return json.load(fp)
 
     def run(self):
         self.open()
@@ -81,13 +82,17 @@ class Client():
         self.quiz = quiz
         self.options = options
         def guess():
-            self.send_answer(self.trivia.guess(quiz, options))
-        thread = Thread(target = guess)
+            index, confidence = self.trivia.guess(quiz, options)
+            self.send_answer(index, confidence)
+        thread = Thread(target=guess)
         thread.start()
 
-    def send_answer(self, answer_index):
+    def send_answer(self, answer_index, confidence):
         answer = self.options[answer_index]
-        print(f"best guess is: '{answer}' ")
+        payload = {
+            "value1": f"Best guess is: '{answer}' with {confidence}% confidence"
+        }
+        requests.post(self.config['notification_url'], data=json.dumps(payload), headers={'Content-Type': 'application/json'})
 
     def log_question(self, data):
         answers = {
@@ -110,5 +115,6 @@ class Client():
 
 client = Client()
 #client.on_msg(json.loads('{"type": "data", "id": "7", "payload": {"data": {"questionStarted": {"id": "5bc0c3ed2a43c338a9048094", "quiz": "\u00bfQu\u00e9 significa la sigla R.I.P. en espa\u00f1ol?", "options": ["Reanimaci\u00f3n cardiovascular", "Descanse en paz", "Auxilio"], "index": 0, "bgColor": null, "footer": null, "__typename": "QuestionStarted"}}}}'))
+#client.send_answer(1)
 #client.on_msg(json.loads('{"type": "data", "id": "8", "payload": {"data": {"questionFinished": {"id": "5bc0c3ed2a43c338a9048094", "quiz": "\u00bfQu\u00e9 significa la sigla R.I.P. en espa\u00f1ol?", "answer": 1, "options": ["Reanimaci\u00f3n cardiovascular", "Descanse en paz", "Auxilio"], "stats": [3045, 47523, 332], "index": 0, "extraLifeAllowed": true, "bgColor": null, "footer": null, "__typename": "QuestionFinished"}}}}'))
 client.run()

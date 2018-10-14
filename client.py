@@ -3,7 +3,7 @@ import requests
 import json
 import sys
 import trivia
-import threading
+from threading import Thread
 import os
 
 class Client():
@@ -19,16 +19,16 @@ class Client():
             'Sec-WebSocket-Protocol: graphql-ws',
             'origin: http://socket.ingame.dift.co/',
         ]
+        self.current_directory = os.path.dirname(os.path.abspath(__file__))
         self.token = self.load_token()
         self.trivia = trivia.Guesser()
         self.ws = None
         self.is_running = False
-        self.question_id = None
         self.quiz = None
         self.options = None
 
     def load_token(self):
-        with open(os.path.dirname(os.path.abspath(__file__)) + '/settings.json', 'r') as fp:
+        with open(f"{self.current_directory}/settings.json", 'r') as fp:
             return json.load(fp)['ingame_token']
 
     def run(self):
@@ -59,14 +59,11 @@ class Client():
         self.send(r'{"id":"5","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onGameStateUpdated","query":"subscription onGameStateUpdated {\n  gameStateUpdated {\n    id\n    state\n    __typename\n  }\n}\n","authorization":"' + self.token + '"}}')
 
     def on_msg(self, data):
-        if 'id' in data and data['id'] is 7:
+        if 'id' in data and data['id'] is '7':
             print('-----QUESTION RECEIVED----')
-            content = json.loads(data['payload'])
-            options = content['options']
-            quiz = content['quiz']
-            id = content['id']
-            self.process_question(id, quiz, options)
-            print(f"question id: {id}")
+            options = data['payload']['data']['questionStarted']['options']
+            quiz = data['payload']['data']['questionStarted']['quiz']
+            self.process_question(quiz, options)
             print(f"quiz: {quiz}")
             print(f"options: {options}")
         elif 'id' in data and data['id'] is '8':
@@ -76,16 +73,15 @@ class Client():
             print(json.dumps(data))
         sys.stdout.flush()
 
-    def process_question(self, question_id, quiz, options):
-        self.question_id = question_id
+    def process_question(self, quiz, options):
         self.quiz = quiz
         self.options = options
         def guess():
-            self.guess_callback(self.trivia.guess(quiz, options))
-        thread = Thread(guess)
+            self.send_answer(self.trivia.guess(quiz, options))
+        thread = Thread(target = guess)
         thread.start()
 
-    def guess_callback(self, answer_index):
+    def send_answer(self, answer_index):
         answer = self.options[answer_index]
         print(f"best guess is: '{answer}' ")
 

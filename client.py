@@ -69,6 +69,9 @@ class Client():
             print(f"question id: {id}")
             print(f"quiz: {quiz}")
             print(f"options: {options}")
+        elif 'id' in data and data['id'] is '8':
+            print('data')
+            self.log_question(data['payload']['data']['questionFinished'])
         else:
             print(json.dumps(data))
         sys.stdout.flush()
@@ -86,5 +89,26 @@ class Client():
         answer = self.options[answer_index]
         print(f"best guess is: '{answer}' ")
 
+    def log_question(self, data):
+        answers = {
+            'items': []
+        }
+        log_path = f"{self.current_directory}/trivia.json"
+        if os.path.exists(log_path):
+            with open(log_path, 'r') as fp:
+                answers = json.load(fp)
+
+        answers['items'].append({
+            'quiz': data['quiz'],
+            'options' : data['options'],
+            'answer' : data['answer']
+        })
+
+        with open(log_path, 'w+') as fp:
+            json.dump(answers, fp)
+
+
 client = Client()
+#client.on_msg(json.loads('{"type": "data", "id": "7", "payload": {"data": {"questionStarted": {"id": "5bc0c3ed2a43c338a9048094", "quiz": "\u00bfQu\u00e9 significa la sigla R.I.P. en espa\u00f1ol?", "options": ["Reanimaci\u00f3n cardiovascular", "Descanse en paz", "Auxilio"], "index": 0, "bgColor": null, "footer": null, "__typename": "QuestionStarted"}}}}'))
+#client.on_msg(json.loads('{"type": "data", "id": "8", "payload": {"data": {"questionFinished": {"id": "5bc0c3ed2a43c338a9048094", "quiz": "\u00bfQu\u00e9 significa la sigla R.I.P. en espa\u00f1ol?", "answer": 1, "options": ["Reanimaci\u00f3n cardiovascular", "Descanse en paz", "Auxilio"], "stats": [3045, 47523, 332], "index": 0, "extraLifeAllowed": true, "bgColor": null, "footer": null, "__typename": "QuestionFinished"}}}}'))
 client.run()

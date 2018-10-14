@@ -2,19 +2,15 @@ from termcolor import colored
 from timeit import default_timer as timer
 import spacy
 import json
-import os
+import config
 from googleapiclient.discovery import build
 
 class Searcher():
 
     def __init__(self):
-        self.config = self.load_config()
+        self.config = config.load()
         self.api_key = self.config['google_api_key']
         self.cse_id = self.config['google_cse_id']
-
-    def load_config(self):
-        with open(os.path.dirname(os.path.abspath(__file__)) + '/settings.json', 'r') as fp:
-            return json.load(fp)
 
     def google_search(self, search_term, **kwargs):
         service = build("customsearch", "v1", developerKey=self.api_key)
@@ -29,8 +25,15 @@ class Guesser():
 
     def __init__(self):
         self.solver = Searcher()
+        self.config = config.load()
+        self.verbose = self.config['verbose']
+
+    def log(self, msg: str):
+        if self.verbose:
+            print(msg)
 
     def get_keywords(self, question: str) -> list:
+        start = timer()
         keywords = []
         nlp = spacy.load('es_core_news_sm')
         doc = nlp(question)
@@ -38,6 +41,8 @@ class Guesser():
         for token in doc:
             if token.is_alpha and token.pos_ is not 'AUX' and token.pos_ is not 'ADP':
                 keywords.append(token.text.lower())
+        end = timer()
+        print(f"NLP took '{end - start}' seconds.")
         return keywords
 
     def get_search_queries(self, keywords: list, options: list) -> list:
@@ -47,10 +52,10 @@ class Guesser():
     def search_and_rank_queries(self, queries: list, keywords: list, options: list) -> dict:
         probabilities = {}
         for i in range(0, len(queries)):
-            print(f"Running query '{queries[i]}'")
+            self.log(f"Running query '{queries[i]}'")
             data = self.solver.search(queries[i])
             probabilities[options[i]] = self.rank(data, keywords, options[i]) if 'items' in data else 0
-            print(f"Option '{options[i]}' was ranked with {probabilities[options[i]]} points.")
+            self.log(f"Option '{options[i]}' was ranked with {probabilities[options[i]]} points.")
         return probabilities
 
 
@@ -84,24 +89,29 @@ class Guesser():
 def test():
     accuracy = 0
     total = 0
+    total_time = 0
+    verbose = config.load()['verbose']
     def assert_guess(question: str, options: list, answer: int):
         trivia = Guesser()
         nonlocal total
         nonlocal accuracy
+        nonlocal total_time
         start = timer()
         best_guess = trivia.guess(question, options)
         end = timer()
         correct = best_guess is answer
         if correct:
             accuracy += 1
-        print('-------------------------------------------------------------------')
-        print(
-            colored(
-                f"\n{question}. \n* Your answer is '{options[best_guess]}' \n* Correct answer is '{options[answer]}'\n",
-                'green' if correct else 'red'
+        if verbose:
+            print('-------------------------------------------------------------------')
+            print(
+                colored(
+                    f"\n{question}. \n* Your answer is '{options[best_guess]}' \n* Correct answer is '{options[answer]}'\n",
+                    'green' if correct else 'red'
+                )
             )
-        )
-        print(f"Answering this question took {end - start} seconds")
+            print(f"Answering this question took {end - start} seconds")
+        total_time = end - start
         total += 1
 
     assert_guess(
@@ -109,8 +119,7 @@ def test():
         ["Luciana Aymar", "Carlos Espínola", "Juan Curuchet"],
         1
     )
-
-    assert_guess(
+    """assert_guess(
         '¿Qué libro fue prohibido durante la dictadura militar argentina?',
         ["La Metamorfosis","El Principito","Moby Dick"],
         1
@@ -186,9 +195,9 @@ def test():
         u'\u00bfHace cu\u00e1ntos a\u00f1os est\u00e1 el cuerpo de Lenin en el Kremlin?',
         [u"51 a\u00f1os", u"94 a\u00f1os", u"No est\u00e1 en el Kremlin"],
         1
-    )
-
+    )"""
     print('-------------------------------------------------------------------')
+    print(f"Average question took '{total_time / total}' seconds")
     print(f" Trivia guesser had an accuracy of '{(accuracy / total) * 100.0}%'")
 
 if __name__ == '__main__':

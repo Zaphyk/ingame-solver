@@ -1,6 +1,7 @@
 import websocket
 import requests
 import json
+import config
 import sys
 import trivia
 from threading import Thread
@@ -9,7 +10,6 @@ import os
 class Client():
 
     def __init__(self):
-        self.debug = True
         self.endpoint = 'ws://socket.ingame.dift.co/main'
         self.headers = [
             'accept: */*',
@@ -20,17 +20,14 @@ class Client():
             'origin: http://socket.ingame.dift.co/',
         ]
         self.current_directory = os.path.dirname(os.path.abspath(__file__))
-        self.config = self.load_config()
+        self.config = config.load()
         self.token = self.config['ingame_token']
+        self.debug = self.config['debug_proxy']
         self.trivia = trivia.Guesser()
         self.ws = None
         self.is_running = False
         self.quiz = None
         self.options = None
-
-    def load_config(self):
-        with open(f"{self.current_directory}/settings.json", 'r') as fp:
-            return json.load(fp)
 
     def run(self):
         self.open()
@@ -40,7 +37,7 @@ class Client():
     def open(self):
         self.ws = websocket.WebSocket()
         if self.debug:
-            self.ws.connect(self.endpoint, http_proxy_host="192.168.0.14", http_proxy_port=8888, header=self.headers)
+            self.ws.connect(self.endpoint, http_proxy_host=self.config['debug_proxy_ip'], http_proxy_port=self.config['debug_proxy_ports'], header=self.headers)
         else:
             self.ws.connect(self.endpoint, header=self.headers)
         self.send('{"type":"connection_init","payload":{}}')

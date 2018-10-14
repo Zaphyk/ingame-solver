@@ -49,7 +49,7 @@ class Guesser():
         for i in range(0, len(queries)):
             print(f"Running query '{queries[i]}'")
             data = self.solver.search(queries[i])
-            probabilities[options[i]] = self.rank(data, keywords, options[i]) if 'items' in data else -1
+            probabilities[options[i]] = self.rank(data, keywords, options[i]) if 'items' in data else 0
             print(f"Option '{options[i]}' was ranked with {probabilities[options[i]]} points.")
         return probabilities
 
@@ -64,16 +64,18 @@ class Guesser():
             rank += title.count(option.lower())
         return rank
 
-    def analyze(self, probabilities: dict, options: list):
+    def analyze(self, probabilities: dict, options: list) -> list:
         highest = -1
         highest_name = None
+        sum_probabilities = 0
         for name, probability in probabilities.items():
+            sum_probabilities += probability
             if probability > highest:
                 highest = probability
                 highest_name = name
-        return options.index(highest_name)
+        return [options.index(highest_name), int(highest / sum_probabilities * 100)]
 
-    def guess(self, question: str, options: list) -> int:
+    def guess(self, question: str, options: list) -> list:
         keywords = self.get_keywords(question)
         queries = self.get_search_queries(keywords, options)
         probabilities = self.search_and_rank_queries(queries, keywords, options)

@@ -59,16 +59,20 @@ class Client():
         self.send(r'{"id":"5","type":"start","payload":{"variables":{},"extensions":{},"operationName":"onGameStateUpdated","query":"subscription onGameStateUpdated {\n  gameStateUpdated {\n    id\n    state\n    __typename\n  }\n}\n","authorization":"' + self.token + '"}}')
 
     def on_msg(self, data):
-        if 'id' in data and data['id'] is '7':
-            print('-----QUESTION RECEIVED----')
-            options = data['payload']['data']['questionStarted']['options']
-            quiz = data['payload']['data']['questionStarted']['quiz']
-            self.process_question(quiz, options)
-            print(f"quiz: {quiz}")
-            print(f"options: {options}")
-        elif 'id' in data and data['id'] is '8':
-            print('data')
-            self.log_question(data['payload']['data']['questionFinished'])
+        if 'id' in data:
+            if data['id'] is '7':
+                print('-----QUESTION RECEIVED----')
+                options = data['payload']['data']['questionStarted']['options']
+                quiz = data['payload']['data']['questionStarted']['quiz']
+                self.process_question(quiz, options)
+                print(f"quiz: {quiz}")
+                print(f"options: {options}")
+
+            elif data['id'] is '8':
+                self.log_question(data['payload']['data']['questionFinished'])
+
+            elif data['id'] is '5' and data['payload']['data']['gameStateUpdated']['state'] is 'FINISHED':
+                sys.exit(0)
         else:
             print(json.dumps(data))
         sys.stdout.flush()

@@ -114,89 +114,14 @@ def test():
         total_time = end - start
         total += 1
 
-    assert_guess(
-        '¿Cuál de estos deportistas argentinos fue dos veces abanderado Olímpico?',
-        ["Luciana Aymar", "Carlos Espínola", "Juan Curuchet"],
-        1
-    )
-
-    assert_guess(
-        '¿Qué libro fue prohibido durante la dictadura militar argentina?',
-        ["La Metamorfosis","El Principito","Moby Dick"],
-        1
-    )
-
-    assert_guess(
-        '¿Dónde se encuentra el mejor restaurante de Latinoamérica según "Chefs\' Choice Award"?',
-        ["Buenos Aires, Argentina","Bogotá, Colombia","Lima, Perú"],
-        2
-    )
-
-    assert_guess(
-        u'\u00bfQu\u00e9 significa la sigla R.I.P. en espa\u00f1ol?',
-        [u"Reanimaci\u00f3n cardiovascular", "Descanse en paz", "Auxilio"],
-        1
-    )
-
-    assert_guess(
-        u'\u00bfCu\u00e1l de estos equipos no se encuentra en la semifinal de la Copa Libertadores 2018?',
-        ["Gremio", "Cruzeiro", "Palmeiras"],
-        1
-    )
-
-    assert_guess(
-        u'\u00bfQu\u00e9 artista participa en el nuevo video de Bad Bunny lanzado ayer?',
-        ["Nicky Jam", "J. Balvin", "Drake"],
-        2
-    )
-
-    assert_guess(
-        u'\u00bfQui\u00e9n escribi\u00f3 \"El T\u00fanel\"?',
-        [u"Ernesto S\u00e1bato", "Jorge Luis Borges", u"Julio Cort\u00e1zar"],
-        0
-    )
-
-    assert_guess(
-        u'\u00bfC\u00f3mo se llama el perro que recrea fotos de Madonna?',
-        ["Chrisdonna", "Maxdonna", "Mikedonna"],
-        1
-    )
-
-    assert_guess(
-        u'\u00bfQu\u00e9 contienen las semillas de la manzana?',
-        ["Cianuro", u"Almid\u00f3n", u"Prote\u00ednas"],
-        0
-    )
-
-    assert_guess(
-        u'\u00bfCu\u00e1l de estos no es uno de los 7 enanitos de Blanca Nieves?',
-        ["Mocoso", u"Bonach\u00f3n", u"Cantar\u00edn"],
-        2
-    )
-
-    assert_guess(
-        u'\u00bfQu\u00e9 pa\u00eds tiene m\u00e1s pir\u00e1mides?',
-        [u"M\u00e9xico", "China", u"Sud\u00e1n"],
-        2
-    )
-
-    assert_guess(
-        u'\u00bfCu\u00e1l de estos dinosaurios fue el m\u00e1s grande?',
-        ["Paralititan", "T-Rex", "Diplodocus"],
-        2
-    )
-
-    assert_guess(
-        u'\u00bfQui\u00e9n fue el sucesor de George H. W. Bush?',
-        ["Barack Obama", "Jimmy Carter", "Bill Clinton"],
-        2
-    )
-
-    assert_guess(
-        u'\u00bfHace cu\u00e1ntos a\u00f1os est\u00e1 el cuerpo de Lenin en el Kremlin?',
-        [u"51 a\u00f1os", u"94 a\u00f1os", u"No est\u00e1 en el Kremlin"],
-        1
-    )
+    with open(os.path.dirname(os.path.abspath(__file__)) + '/trivia.json', 'r') as fp:
+        test_data = json.load(fp)['items']
+        for item in test_data:
+            assert_guess(
+                item['quiz'],
+                item['options'],
+                item['answer']
+            )
     print('-------------------------------------------------------------------')
     print(f"Average question took '{(total_time / total)}' seconds")
     print(f" Trivia guesser had an accuracy of '{(accuracy / total) * 100.0}%'")

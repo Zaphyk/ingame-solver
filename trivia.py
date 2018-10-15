@@ -3,6 +3,7 @@ from timeit import default_timer as timer
 import spacy
 import json
 import config
+import os
 from googleapiclient.discovery import build
 
 class Searcher():
@@ -69,22 +70,33 @@ class Guesser():
             rank += title.count(option.lower())
         return rank
 
-    def analyze(self, probabilities: dict, options: list) -> list:
-        highest = -1
+    def analyze(self, keywords: list, probabilities: dict, options: list) -> list:
+        highest = -sys.maxint
         highest_name = None
+        lowest = sys.maxint
+        lowest_name = None
         sum_probabilities = 0
         for name, probability in probabilities.items():
             sum_probabilities += probability
+
             if probability > highest:
                 highest = probability
                 highest_name = name
-        return [options.index(highest_name), int(highest / sum_probabilities * 100)]
+
+            if probability < lowest:
+                lowest = probability
+                lowest_name = name
+
+        if 'no' in keywords:
+            return [options.index(lowest_name), int(100 - low / sum_probabilities * 100)]
+        else:
+            return [options.index(highest_name), int(highest / sum_probabilities * 100)]
 
     def guess(self, question: str, options: list) -> list:
         keywords = self.get_keywords(question)
         queries = self.get_search_queries(keywords, options)
         probabilities = self.search_and_rank_queries(queries, keywords, options)
-        return self.analyze(probabilities, options)
+        return self.analyze(keywords, probabilities, options)
 
 def test():
     accuracy = 0

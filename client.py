@@ -67,9 +67,11 @@ class Client():
                 print(f"options: {options}")
 
             elif data['id'] is '8':
+                print('-----ANSWER RECEIVED----')
                 self.log_question(data['payload']['data']['questionFinished'])
 
             elif data['id'] is '5' and data['payload']['data']['gameStateUpdated']['state'] is 'FINISHED':
+                print('------GAME ENDED----')
                 sys.exit(0)
         else:
             print(json.dumps(data))

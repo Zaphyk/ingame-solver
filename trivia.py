@@ -26,6 +26,7 @@ class Guesser():
     def __init__(self):
         self.solver = Searcher()
         self.config = config.load()
+        self.nlp = spacy.load('es_core_news_sm')
         self.verbose = self.config['verbose']
 
     def log(self, msg: str):
@@ -35,8 +36,7 @@ class Guesser():
     def get_keywords(self, question: str) -> list:
         start = timer()
         keywords = []
-        nlp = spacy.load('es_core_news_sm')
-        doc = nlp(question)
+        doc = self.nlp(question)
 
         for token in doc:
             if token.is_alpha and token.pos_ is not 'AUX' and token.pos_ is not 'ADP':
@@ -90,14 +90,14 @@ def test():
     accuracy = 0
     total = 0
     total_time = 0
+    trivia = Guesser()
     verbose = config.load()['verbose']
     def assert_guess(question: str, options: list, answer: int):
-        trivia = Guesser()
         nonlocal total
         nonlocal accuracy
         nonlocal total_time
         start = timer()
-        best_guess = trivia.guess(question, options)
+        best_guess, confidence = trivia.guess(question, options)
         end = timer()
         correct = best_guess is answer
         if correct:
@@ -119,6 +119,7 @@ def test():
         ["Luciana Aymar", "Carlos Espínola", "Juan Curuchet"],
         1
     )
+
     assert_guess(
         '¿Qué libro fue prohibido durante la dictadura militar argentina?',
         ["La Metamorfosis","El Principito","Moby Dick"],
@@ -197,7 +198,7 @@ def test():
         1
     )
     print('-------------------------------------------------------------------')
-    print(f"Average question took '{total_time / total}' seconds")
+    print(f"Average question took '{(total_time / total)}' seconds")
     print(f" Trivia guesser had an accuracy of '{(accuracy / total) * 100.0}%'")
 
 if __name__ == '__main__':

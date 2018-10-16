@@ -3,6 +3,7 @@ from timeit import default_timer as timer
 import spacy
 import json
 import config
+from random import shuffle
 import os
 from googleapiclient.discovery import build
 
@@ -128,7 +129,9 @@ def test():
 
     with open(os.path.dirname(os.path.abspath(__file__)) + '/trivia.json', 'r') as fp:
         test_data = json.load(fp)['items']
-        for item in test_data:
+        shuffle(test_data)
+        cases = test_data[0:8]
+        for item in cases:
             assert_guess(
                 item['quiz'],
                 item['options'],

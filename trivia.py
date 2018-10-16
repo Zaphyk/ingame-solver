@@ -73,9 +73,9 @@ class Guesser():
         return rank
 
     def analyze(self, keywords: list, probabilities: dict, options: list) -> list:
-        highest = -sys.maxint
+        highest = -sys.maxsize
         highest_name = None
-        lowest = sys.maxint
+        lowest = sys.maxsize
         lowest_name = None
         sum_probabilities = 0
         for name, probability in probabilities.items():

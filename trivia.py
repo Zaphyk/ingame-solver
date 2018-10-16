@@ -90,7 +90,7 @@ class Guesser():
                 lowest_name = name
 
         if 'no' in keywords:
-            return [options.index(lowest_name), int(100 - low / sum_probabilities * 100)]
+            return [options.index(lowest_name), int(100 - lowest / sum_probabilities * 100)]
         else:
             return [options.index(highest_name), int(highest / sum_probabilities * 100)]
 

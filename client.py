@@ -93,7 +93,8 @@ class Client():
         payload = {
             "value1": f"Best guess is: '{answer}' with {confidence}% confidence"
         }
-        requests.post(self.config['notification_url'], data=json.dumps(payload), headers={'Content-Type': 'application/json'})
+        for url in self.config['notification_urls']:
+            requests.post(url, data=json.dumps(payload), headers={'Content-Type': 'application/json'})
 
     def log_question(self, data):
         answers = {

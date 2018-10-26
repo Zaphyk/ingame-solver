@@ -74,7 +74,6 @@ class Client():
 
             elif data['id'] is '5' and data['payload']['data']['gameStateUpdated']['state'] is 'FINISHED':
                 print('------GAME ENDED----')
-                sys.exit(0)
         else:
             print(json.dumps(data))
         sys.stdout.flush()
